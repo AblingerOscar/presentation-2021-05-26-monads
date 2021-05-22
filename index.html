@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Monads in Kotlin and Java</title>
 
 		<link rel="stylesheet" href="dist/reset.css">
 		<link rel="stylesheet" href="dist/reveal.css">
@@ -25,13 +25,44 @@
 				position: relative !important;
 			}
 
-			/* Custom styles */
+			/* ===== Custom styles ===== */
 			.footnote {
 				position: fixed !important;
 				bottom: 0 !important;
 				margin-left: auto !important;
 				margin-right: auto !important;
 				font-size: 1.5rem;
+			}
+
+			/* code blocks */
+			code {
+				-moz-tab-size: 2;
+				tab-size: 2;
+			}
+			.code-comparison {
+				width: 100%;
+
+				display: grid;
+				grid-template-columns: calc(50% - 0.5rem) 1rem calc(50% - 0.5rem);
+				grid-template-areas: "kotlin . java";
+			}
+			.code-comparison pre.kotlin {
+				grid-area: kotlin
+			}
+			.code-comparison pre.java {
+				grid-area: java
+			}
+			.code-comparison pre code {
+				width: 100%;
+				font-size: 0.75rem;
+				line-height: 1rem;
+			}
+			section[data-auto-animate="running"] code {
+				overflow: hidden;
+			}
+
+			.wide {
+				width: 100%;
 			}
 
 			/* background */
@@ -90,13 +121,116 @@
 			<div class="slides">
 				<section>
 					<h1>Monads</h1>
-					What? Why? Where?
 
+					<p>What? Why? Where?</p>
 					<div class="footnote">Slides: <a href="https://github.com/AblingerOscar/presentation-2021-05-27-monads">https://github.com/AblingerOscar/presentation-2021-05-27-monads</a></div>
 				</section>
 				<section>
-					<h1>Monads</h1>
-					What? Why? Where?
+					<section data-auto-animate>
+						<h2>What are Monads?</h2>
+
+						<aside class="notes">
+							- Many ways to define monads<br>
+							- Kotlin/Java focus -> just a class with 2 certain methods
+						</aside>
+					</section>
+					<section data-auto-animate>
+						<h2>What are Monads?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers>data class Monad&ltT&gt(val value: T) {
+	
+	companion object {
+		fun &ltT&gt of(value: T): Monad&ltT&gt =
+			Monad(value)
+	}
+
+}</code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers>public class Monad&ltT&gt {
+
+	private T value;
+
+	private Monad(T value) {
+		this.value = value;
+	}
+
+	public static &ltT&gt Monad&ltT&gt of(T value) {
+		return new Monad&lt&gt(value);
+	}
+}</code></pre>
+						</div>
+					</section>
+					<section data-auto-animate>
+						<h2>What are Monads?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers>data class Monad&ltT&gt(val value: T) {
+
+	fun &ltR&gt flatMap(f: (T) -&gt Monad&ltR&gt): Monad&ltR&gt {
+		return f(value)
+	}
+
+	companion object {
+		fun &ltT&gt of(value: T): Monad&ltT&gt =
+			Monad(value)
+	}
+
+}</code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers>public class Monad&ltT&gt {
+
+	private T value;
+
+	private Monad(T value) {
+		this.value = value;
+	}
+
+	public static &ltT&gt Monad&ltT&gt of(T value) {
+		return new Monad&lt&gt(value);
+	}
+
+	public&ltR&gt Monad&ltR&gt flatMap(Function&ltT,Monad&ltR&gt&gt f){
+		return f(value);
+	}
+
+}</code></pre>
+						</div>
+					</section>
+				</section>
+				<section>
+					<section data-auto-animate>
+						<h2>3 Rules</h2>
+						<p>…for how these methods need to behave</p>
+					</section>
+					<section data-auto-animate>
+						<h2>3 rules</h2>
+
+						<div class="wide">
+							<p>The <code>of</code> method is a left-identity for <code>bind</code></p>
+							<div class="code-comparison">
+								<pre class="kotlin"><code class="kotlin">of(x).flatMap(f) == f(x)</code></pre>
+								<pre class="java"><code class="java">of(x).flatMap(f).equals(f.apply(x))</code></pre>
+							</div>
+						</div>
+						<div class="wide fragment">
+							<p>The <code>of</code> method is a right-identity for <code>bind</code></p>
+							<div class="code-comparison">
+								<pre class="kotlin"><code class="kotlin">m.flatMap(Companion::of) == m</code></pre>
+								<pre class="java"><code class="java">m.flatMap(Monad::of).equals(m)</code></pre>
+							</div>
+						</div>
+						<div class="wide fragment">
+							<p>The <code>bind</code> method is associative</p>
+							<div class="code-comparison">
+								<pre class="kotlin"><code class="kotlin">m.flatMap(g).flatMap(h) == m.flatMap { g(it).flatMap(h) }</code></pre>
+								<pre class="java"><code class="java">m.flatMap(g).flatMap(h)
+	.equals(m.flatMap(v -> g.apply(v).flatMap(h)))</code></pre>
+							</div>
+						</div>
+					</section>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+					</textarea>
 				</section>
 
 				<!--
@@ -105,6 +239,13 @@
 						# Slide 1
 						
 						Some text
+
+
+						# Why?
+						make errors part of your domain
+						e.g. Result? or Optional<Result>
+						Why Optional? Because with return value Result it's not clear whether null is part of the domain
+
 					</textarea>
 				</section>
 				-->
