@@ -33,6 +33,43 @@
 				margin-right: auto !important;
 				font-size: 1.5rem;
 			}
+
+			/* background */
+			.custom-background {
+				filter: grayscale();
+				opacity: 0.1;
+
+				position: fixed;
+				left: 15%;
+				right: 15%;
+				top: 0;
+				bottom: 0;
+
+				display: flex;
+				justify-content: space-around;
+				align-items: center;
+			}
+			.custom-background .cbg-img {
+				flex: 1;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.custom-background .separator {
+				flex: 0.5;
+			}
+			.custom-background .separator::after {
+				content: ' ';
+				border-left: 3px solid black;
+				position: absolute;
+				left: 50%;
+				top: 20%;
+				bottom: 20%;
+			}
+			.custom-background .cbg-img img {
+				max-width: 100%;
+				max-height: 100%;
+			}
 		</style>
 
 		<!-- Theme used for syntax highlighted code -->
@@ -40,17 +77,26 @@
 	</head>
 	<body>
 		<div class="reveal">
+			<div class="custom-background">
+				<div class="cbg-img">
+					<img src="./kotlin.svg"/>
+				</div>
+				<div class="separator"></div>
+				<div class="cbg-img">
+					<img src="./java.svg"/>
+				</div>
+			</div>
+
 			<div class="slides">
 				<section>
 					<h1>Monads</h1>
 					What? Why? Where?
 
-					<div class="footnote">Slides: <a href="https://github.com/AblingerOscar/">https://github.com/AblingerOscar/</a></div>
+					<div class="footnote">Slides: <a href="https://github.com/AblingerOscar/presentation-2021-05-27-monads">https://github.com/AblingerOscar/presentation-2021-05-27-monads</a></div>
 				</section>
 				<section>
 					<h1>Monads</h1>
-					Explained with code
-
+					What? Why? Where?
 				</section>
 
 				<!--
