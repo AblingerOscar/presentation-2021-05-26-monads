@@ -46,10 +46,10 @@
 				grid-template-columns: calc(50% - 0.5rem) 1rem calc(50% - 0.5rem);
 				grid-template-areas: "kotlin . java";
 			}
-			.code-comparison pre.kotlin {
+			.code-comparison .kotlin {
 				grid-area: kotlin
 			}
-			.code-comparison pre.java {
+			.code-comparison .java {
 				grid-area: java
 			}
 			.code-comparison pre code {
@@ -138,81 +138,111 @@
 						<h2>What are Monads?</h2>
 
 						<div class="code-comparison">
-							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers>data class Monad&ltT&gt(val value: T) {
-	
-	companion object {
-		fun &ltT&gt of(value: T): Monad&ltT&gt =
-			Monad(value)
-	}
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Monad<T> private constructor(val value: T) {
 
-}</code></pre>
-							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers>public class Monad&ltT&gt {
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public class Monad<T> {
 
-	private T value;
+									private T value;
 
-	private Monad(T value) {
-		this.value = value;
-	}
-
-	public static &ltT&gt Monad&ltT&gt of(T value) {
-		return new Monad&lt&gt(value);
-	}
-}</code></pre>
+									private Monad(T value) {
+										this.value = value;
+									}
+								}
+							</script></code></pre>
 						</div>
 					</section>
 					<section data-auto-animate>
 						<h2>What are Monads?</h2>
 
 						<div class="code-comparison">
-							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers>data class Monad&ltT&gt(val value: T) {
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Monad<T> private constructor(val value: T) {
+								
+									companion object {
+										fun <T> of(value: T): Monad<T> =
+											Monad(value)
+									}
+								
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public class Monad<T> {
 
-	fun &ltR&gt flatMap(f: (T) -&gt Monad&ltR&gt): Monad&ltR&gt {
-		return f(value)
-	}
+									private T value;
 
-	companion object {
-		fun &ltT&gt of(value: T): Monad&ltT&gt =
-			Monad(value)
-	}
+									private Monad(T value) {
+										this.value = value;
+									}
 
-}</code></pre>
-							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers>public class Monad&ltT&gt {
-
-	private T value;
-
-	private Monad(T value) {
-		this.value = value;
-	}
-
-	public static &ltT&gt Monad&ltT&gt of(T value) {
-		return new Monad&lt&gt(value);
-	}
-
-	public&ltR&gt Monad&ltR&gt flatMap(Function&ltT,Monad&ltR&gt&gt f){
-		return f(value);
-	}
-
-}</code></pre>
+									public static <T> Monad<T> of(T value) {
+										return new Monad<>(value);
+									}
+								}
+							</script></code></pre>
 						</div>
 					</section>
-				</section>
-				<section>
+
+					<section data-auto-animate>
+						<h2>What are Monads?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Monad<T> private constructor(val value: T) {
+
+									fun <R> flatMap(f: (T) -> Monad<R>): Monad<R> {
+										return f(value)
+									}
+
+									companion object {
+										fun <T> of(value: T): Monad<T> =
+											Monad(value)
+									}
+
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public class Monad<T> {
+
+									private T value;
+
+									private Monad(T value) {
+										this.value = value;
+									}
+
+									public static <T> Monad<T> of(T value) {
+										return new Monad<>(value);
+									}
+
+									public<R> Monad<R> flatMap(Function<T,Monad<R>> f){
+										return f.apply(value);
+									}
+
+								}
+							</script></code></pre>
+						</div>
+					</section>
+					
 					<section data-auto-animate>
 						<h2>3 Rules</h2>
 						<p>…for how these methods need to behave</p>
+						<p class="fragment">…but you're likely going to fulfill them intuitively.</p>
 					</section>
 					<section data-auto-animate>
 						<h2>3 rules</h2>
 
 						<div class="wide">
-							<p>The <code>of</code> method is a left-identity for <code>bind</code></p>
+							<p>The <code>unit</code> method is a left-identity for <code>bind</code></p>
 							<div class="code-comparison">
 								<pre class="kotlin"><code class="kotlin">of(x).flatMap(f) == f(x)</code></pre>
 								<pre class="java"><code class="java">of(x).flatMap(f).equals(f.apply(x))</code></pre>
 							</div>
 						</div>
 						<div class="wide fragment">
-							<p>The <code>of</code> method is a right-identity for <code>bind</code></p>
+							<p>The <code>unit</code> method is a right-identity for <code>bind</code></p>
 							<div class="code-comparison">
 								<pre class="kotlin"><code class="kotlin">m.flatMap(Companion::of) == m</code></pre>
 								<pre class="java"><code class="java">m.flatMap(Monad::of).equals(m)</code></pre>
@@ -228,10 +258,219 @@
 						</div>
 					</section>
 				</section>
-				<section data-markdown>
-					<textarea data-template>
-					</textarea>
-				</section>
+				<section>
+					<section data-auto-animate>
+						<h2>Why use them?</h2>
+
+						<aside class="notes">
+							- In heavily functional languages they arise naturally from the tools and problems<br>
+							- In Java/Kotlin less so, since the problems are usually solved differently<br>
+								e.g. we don't care about side effects<br>
+							- What we do care about: Domains<br>
+								Make errors part of your domain<br>
+							- Callback Hell? Just make it a monad<br>
+						</aside>
+					</section>
+
+					<section data-auto-animate>
+						<h2>Why use them?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Monad<T> private constructor(val value: T) {
+
+									fun <R> flatMap(f: (T) -> Monad<R>): Monad<R> {
+										return f(value)
+									}
+
+									companion object {
+										fun <T> of(value: T): Monad<T> =
+											Monad(value)
+									}
+
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public class Monad<T> {
+
+									private T value;
+
+									private Monad(T value) {
+										this.value = value;
+									}
+
+									public static <T> Monad<T> of(T value) {
+										return new Monad<>(value);
+									}
+
+									public<R> Monad<R> flatMap(Function<T,Monad<R>> f){
+										return f.apply(value);
+									}
+
+								}
+							</script></code></pre>
+						</div>
+
+					</section>
+
+					<section data-auto-animate>
+						<h2>Why use them?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Maybe<T> private constructor(val value: T) {
+
+									fun <R> flatMap(f: (T) -> Maybe<R>): Maybe<R> {
+										return f(value)
+									}
+
+									companion object {
+										fun <T> of(value: T): Maybe<T> =
+											Maybe(value)
+									}
+
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public class Maybe<T> {
+
+									private T value;
+
+									private Maybe(T value) {
+										this.value = value;
+									}
+
+									public static <T> Maybe<T> of(T value) {
+										return new Maybe<>(value);
+									}
+
+									public<R> Maybe<R> flatMap(Function<T,Maybe<R>> f){
+										return f.apply(value);
+									}
+
+								}
+							</script></code></pre>
+						</div>
+
+					</section>
+
+					<section data-auto-animate>
+						<h2>Why use them?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Maybe<T> private constructor
+										val value: T?,
+										val hasValue: Boolean) {
+
+									fun <R> flatMap(f: (T) -> Maybe<R>): Maybe<R> {
+										if (hasValue)
+											return f(value!!)
+										else
+											return Maybe.of()
+									}
+
+									companion object {
+										fun <T> of(value: T): Maybe<T> =
+											Maybe(value, true)
+										fun <T> of(): Maybe<T> = Maybe(null, false)
+									}
+
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								class Maybe<T> {
+
+									private T value;
+									private boolean hasValue;
+
+									private Maybe(T value, boolean hasValue) {
+										this.value = value;
+										this.hasValue = hasValue;
+									}
+
+									public static <T> Maybe<T> of(T value) {
+										return new Maybe<>(value, true);
+									}
+
+									public static <T> Maybe<T> of() {
+										return new Maybe<>(null, false);
+									}
+
+									public<R> Maybe<R> flatMap(Function<T,Maybe<R>> f){
+										if (hasValue)
+											return f.apply(value);
+										else
+											return Maybe.of();
+									}
+								}
+							</script></code></pre>
+						</div>
+
+					</section>
+
+					<section data-auto-animate>
+						<h2>Why use them?</h2>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								class Maybe<T> private constructor
+										val value: T?,
+										val hasValue: Boolean) {
+
+									fun <R> flatMap(f: (T) -> Maybe<R>): Maybe<R> { … }
+									companion object {
+										fun <T> of(value: T): Maybe<T> =
+											Maybe(value, true)
+										fun <T> of(): Maybe<T> = Maybe(null, false)
+									}
+
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								class Maybe<T> {
+									…
+									public static <T> Maybe<T> of(T value) {
+										return new Maybe<>(value, true);
+									}
+
+									public static <T> Maybe<T> of() {
+										return new Maybe<>(null, false);
+									}
+
+									public<R> Maybe<R> flatMap(Function<T,Maybe<R>> f){
+										…
+									}
+
+								}
+							</script></code></pre>
+						</div>
+
+						<div class="code-comparison">
+							<pre class="kotlin" data-id="code-kotlin"><code class="kotlin" data-trim data-line-numbers><script type="text/template">
+								fun doSomething(m: Maybe<Int>): Maybe<Int> {
+									return m
+										.flatMap { Maybe.of(it * 5) }
+										.flatMap {
+											if (it % 2 == 0) Maybe.of(it/2) else Maybe.of()
+										}
+										.flatMap { Maybe.of(it + 10) }
+								}
+							</script></code></pre>
+							<pre class="java" data-id="code-java"><code class="java" data-trim data-line-numbers><script type="text/template">
+								public Maybe<Integer> doSomething(Maybe<Integer> m) {
+									return m
+										.flatMap(v -> Maybe.of(v * 5))
+										.flatMap(v -> {
+											if (v % 2 == 0) return Maybe.of(v/2);
+											else return Maybe.of();
+										})
+										.flatMap(v -> Maybe.of(v + 10));
+								}
+							</script></code></pre>
+						</div>
+
+					</section>
 
 				<!--
 				<section data-markdown>
