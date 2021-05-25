@@ -57,8 +57,41 @@
 				font-size: 0.75rem;
 				line-height: 1rem;
 			}
-			section[data-auto-animate="running"] code {
-				overflow: hidden;
+			/* mobile code blocks */
+			.lang-selection {
+				display: none;
+
+				position: fixed !important;
+				top: 1rem !important;
+				right: 1rem !important;
+
+				z-index: 1;
+			}
+			
+			@media screen and (max-width: 900px),
+				   screen and (max-height: 700px) {
+				.code-comparison[data-selected-lang="java"]:not(.show-both-on-mobile) {
+					grid-template-areas: "java java java";
+				}
+				.code-comparison[data-selected-lang="java"]:not(.show-both-on-mobile) .kotlin {
+					display: none;
+				}
+
+				.code-comparison[data-selected-lang="kotlin"]:not(.show-both-on-mobile) {
+					grid-template-areas: "kotlin kotlin kotlin";
+				}
+				.code-comparison[data-selected-lang="kotlin"]:not(.show-both-on-mobile) .java {
+					display: none;
+				}
+
+				.lang-selection {
+					display: inherit;
+				}
+
+				.code-comparison pre code {
+					font-size: 1.5rem;
+					line-height: 1.5rem;
+				}
 			}
 
 			.wide {
@@ -120,6 +153,10 @@
 				<div class="cbg-img">
 					<img src="./java.svg"/>
 				</div>
+			</div>
+
+			<div class="lang-selection">
+				<button id="lang-switch-btn" type="button">Switch to Java</button>
 			</div>
 
 			<div class="slides">
@@ -437,15 +474,12 @@
 									public static <T> Maybe<T> of(T value) {
 										return new Maybe<>(value, true);
 									}
-
 									public static <T> Maybe<T> of() {
 										return new Maybe<>(null, false);
 									}
-
 									public<R> Maybe<R> flatMap(Function<T,Maybe<R>> f){
 										…
 									}
-
 								}
 							</script></code></pre>
 						</div>
@@ -485,7 +519,7 @@
 					
 					<section data-auto-animate>
 						<h2>Where are they?</h2>
-						<div class="code-comparison">
+						<div class="code-comparison show-both-on-mobile">
 							<div class="kotlin">
 								<pre>Iterable (all collections)</pre>
 								<pre>Sequence</pre>
@@ -544,6 +578,33 @@
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
 			});
+
+			const langSwitchButton = document.getElementById('lang-switch-btn')
+
+			var currLanguage = 'unset'
+			function getOtherLanguage(lang) {
+				if (currLanguage === 'kotlin')
+					return 'java'
+				else
+					return 'kotlin'
+			}
+
+			function switchLanguage() {
+				currLanguage = getOtherLanguage(currLanguage)
+
+				document.getElementsByClassName('code-comparison')
+					.forEach(el => el.dataset.selectedLang = currLanguage)
+				
+				function pretty(lang) {
+					return lang.charAt(0).toUpperCase() + lang.slice(1)
+				}
+
+				langSwitchButton.innerText = 'Switch to ' + pretty(getOtherLanguage(currLanguage))
+			}
+
+			langSwitchButton.onclick = switchLanguage
+			switchLanguage()
+
 		</script>
 	</body>
 </html>
